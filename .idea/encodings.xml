@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-assembly/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-assemblysrc/main/java/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-client/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-clientsrc/main/java/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-docs/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-docssrc/main/java/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-jute/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-jutesrc/main/java/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-recipes/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-recipes/zookeeper-recipes-election/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-recipes/zookeeper-recipes-electionsrc/main/java/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-recipes/zookeeper-recipes-lock/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-recipes/zookeeper-recipes-locksrc/main/java/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-recipes/zookeeper-recipes-queue/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-recipes/zookeeper-recipes-queuesrc/main/java/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-recipessrc/main/java/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-serversrc/main/java/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/zookeeper-branch-3.5.8src/main/java/resources" charset="UTF-8" />
+  </component>
+</project>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/parent.iml" filepath="$PROJECT_DIR$/zookeeper-branch-3.5.8/parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/zk-comments.iml" filepath="$PROJECT_DIR$/.idea/zk-comments.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-server/zookeeper.iml" filepath="$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-server/zookeeper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-assembly/zookeeper-assembly.iml" filepath="$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-assembly/zookeeper-assembly.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-client/zookeeper-client.iml" filepath="$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-client/zookeeper-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-docs/zookeeper-docs.iml" filepath="$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-docs/zookeeper-docs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-jute/zookeeper-jute.iml" filepath="$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-jute/zookeeper-jute.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-recipes/zookeeper-recipes.iml" filepath="$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-recipes/zookeeper-recipes.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-recipes/zookeeper-recipes-election/zookeeper-recipes-election.iml" filepath="$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-recipes/zookeeper-recipes-election/zookeeper-recipes-election.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-recipes/zookeeper-recipes-lock/zookeeper-recipes-lock.iml" filepath="$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-recipes/zookeeper-recipes-lock/zookeeper-recipes-lock.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-recipes/zookeeper-recipes-queue/zookeeper-recipes-queue.iml" filepath="$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-recipes/zookeeper-recipes-queue/zookeeper-recipes-queue.iml" />
+    </modules>
+  </component>
+</project>
