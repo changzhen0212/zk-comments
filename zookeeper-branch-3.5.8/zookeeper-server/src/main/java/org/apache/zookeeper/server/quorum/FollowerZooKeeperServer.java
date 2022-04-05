@@ -65,6 +65,7 @@ public class FollowerZooKeeperServer extends LearnerZooKeeperServer {
         return self.follower;
     }
 
+    // # follower的构建责任链
     @Override
     protected void setupRequestProcessors() {
         RequestProcessor finalProcessor = new FinalRequestProcessor(this);
@@ -85,6 +86,8 @@ public class FollowerZooKeeperServer extends LearnerZooKeeperServer {
         if ((request.zxid & 0xffffffffL) != 0) {
             pendingTxns.add(request);
         }
+        // # syncProcessor这个责任链是创建Follower是初始化的,跟leader构造的是不同的对象
+        // ! 同步处理责任链 syncProcessor,将数据存储到本机
         syncProcessor.processRequest(request);
     }
 

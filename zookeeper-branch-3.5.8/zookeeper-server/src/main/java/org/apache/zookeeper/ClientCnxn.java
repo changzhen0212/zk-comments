@@ -471,8 +471,11 @@ public class ClientCnxn {
                 watchers = new HashSet<Watcher>();
                 watchers.addAll(materializedWatchers);
             }
+            // # 构建监听事件
             WatcherSetEventPair pair = new WatcherSetEventPair(watchers, event);
             // queue the pair (watch set & event) for later processing
+            // # 将这对（监视集和事件）排队以供以后处理
+            // # 将监听事件放到队列中 LinkedBlockingQueue<Object> waitingEvents
             waitingEvents.add(pair);
         }
 
@@ -503,10 +506,12 @@ public class ClientCnxn {
            try {
               isRunning = true;
               while (true) {
+                 // # 等待服务端返回的消息
                  Object event = waitingEvents.take();
                  if (event == eventOfDeath) {
                     wasKilled = true;
                  } else {
+                    // ! 处理事件
                     processEvent(event);
                  }
                  if (wasKilled)
@@ -530,6 +535,7 @@ public class ClientCnxn {
               if (event instanceof WatcherSetEventPair) {
                   // each watcher will process the event
                   WatcherSetEventPair pair = (WatcherSetEventPair) event;
+                  // # 循环处理事件
                   for (Watcher watcher : pair.watchers) {
                       try {
                           watcher.process(pair.event);
@@ -714,6 +720,7 @@ public class ClientCnxn {
         if (p.cb == null) {
             synchronized (p) {
                 p.finished = true;
+                // # 唤醒全部, 对应着 submitRequest中的packet.wait()
                 p.notifyAll();
             }
         } else {
@@ -846,6 +853,7 @@ public class ClientCnxn {
                     LOG.debug("Got notification sessionid:0x"
                         + Long.toHexString(sessionId));
                 }
+                // # watcher event监听事件
                 WatcherEvent event = new WatcherEvent();
                 event.deserialize(bbia, "response");
 
@@ -863,12 +871,13 @@ public class ClientCnxn {
                     }
                 }
 
+                // # 构建watch事件
                 WatchedEvent we = new WatchedEvent(event);
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Got " + we + " for sessionid 0x"
                             + Long.toHexString(sessionId));
                 }
-
+                // ! 扔到队列
                 eventThread.queueEvent( we );
                 return;
             }
@@ -924,6 +933,7 @@ public class ClientCnxn {
                             + Long.toHexString(sessionId) + ", packet:: " + packet);
                 }
             } finally {
+                // ! 最终真正处理客户端传回数据
                 finishPacket(packet);
             }
         }
@@ -1219,7 +1229,7 @@ public class ClientCnxn {
                         }
                         to = Math.min(to, pingRwTimeout - idlePingRwServer);
                     }
-
+                    // ! 连接建立后,监听读写事件并处理, 查看NIO或者Netty实现
                     clientCnxnSocket.doTransport(to, pendingQueue, ClientCnxn.this);
                 } catch (Throwable e) {
                     if (closing) {
@@ -1517,6 +1527,7 @@ public class ClientCnxn {
             WatchDeregistration watchDeregistration)
             throws InterruptedException {
         ReplyHeader r = new ReplyHeader();
+        // # 将request封装到packet中,将packet放入queue中等待发送
         Packet packet = queuePacket(h, r, request, response, null, null, null,
                 null, watchRegistration, watchDeregistration);
         synchronized (packet) {
@@ -1525,6 +1536,7 @@ public class ClientCnxn {
                 waitForPacketFinish(r, packet);
             } else {
                 // Wait for request completion infinitely
+                // # 等待服务端返回数据 对应finishPacket方法中notifyAll唤醒
                 while (!packet.finished) {
                     packet.wait();
                 }

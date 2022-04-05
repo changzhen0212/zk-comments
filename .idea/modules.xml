@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/parent.iml" filepath="$PROJECT_DIR$/zookeeper-branch-3.5.8/parent.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/zk-comments.iml" filepath="$PROJECT_DIR$/.idea/zk-comments.iml" />
+      <module fileurl="file://$PROJECT_DIR$/zk-test/zk-test.iml" filepath="$PROJECT_DIR$/zk-test/zk-test.iml" />
       <module fileurl="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-server/zookeeper.iml" filepath="$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-server/zookeeper.iml" />
       <module fileurl="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-assembly/zookeeper-assembly.iml" filepath="$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-assembly/zookeeper-assembly.iml" />
       <module fileurl="file://$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-client/zookeeper-client.iml" filepath="$PROJECT_DIR$/zookeeper-branch-3.5.8/zookeeper-client/zookeeper-client.iml" />

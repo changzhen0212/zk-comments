@@ -7,15 +7,17 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="zookeeper-recipes-queue" />
-        <module name="zookeeper-recipes-election" />
-        <module name="zookeeper-jute" />
+        <module name="zk-test" />
         <module name="zookeeper" />
         <module name="zookeeper-recipes-lock" />
+        <module name="zookeeper-recipes-election" />
+        <module name="zookeeper-jute" />
         <module name="zookeeper-docs" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="parent" target="1.8" />
+      <module name="zk-test" target="8" />
       <module name="zookeeper" target="1.8" />
       <module name="zookeeper-assembly" target="1.8" />
       <module name="zookeeper-client" target="1.8" />

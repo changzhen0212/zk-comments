@@ -109,6 +109,8 @@ public class FinalRequestProcessor implements RequestProcessor {
         ProcessTxnResult rc = null;
         synchronized (zks.outstandingChanges) {
             // Need to process local session requests
+            // # 最终commit操作就是创建本地内存中database的树结构
+            // ! 需要处理本地会话请求 步进
             rc = zks.processTxn(request);
 
             // request.hdr is set for write requests, which are the only ones
@@ -479,7 +481,7 @@ public class FinalRequestProcessor implements RequestProcessor {
             LOG.error("Dumping request buffer: 0x" + sb.toString());
             err = Code.MARSHALLINGERROR;
         }
-
+        // # 最新的zxid
         long lastZxid = zks.getZKDatabase().getDataTreeLastProcessedZxid();
         ReplyHeader hdr =
             new ReplyHeader(request.cxid, lastZxid, err.intValue());
@@ -489,6 +491,7 @@ public class FinalRequestProcessor implements RequestProcessor {
                     request.createTime, Time.currentElapsedTime());
 
         try {
+            // ! 返回数据给客户端, 实现类-NettyServerCnxn/NioServerCnxn
             cnxn.sendResponse(hdr, rsp, "response");
             if (request.type == OpCode.closeSession) {
                 cnxn.sendCloseSession();

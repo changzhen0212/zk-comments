@@ -138,6 +138,7 @@ public class Learner {
     void writePacket(QuorumPacket pp, boolean flush) throws IOException {
         synchronized (leaderOs) {
             if (pp != null) {
+                // ! BinaryOutputArchive 序列化 BIO发送
                 leaderOs.writeRecord(pp, "packet");
             }
             if (flush) {
@@ -571,6 +572,7 @@ public class Learner {
         ack.setZxid(ZxidUtils.makeZxid(newEpoch, 0));
         writePacket(ack, true);
         sock.setSoTimeout(self.tickTime * self.syncLimit);
+        // !
         zk.startup();
         /*
          * Update the election vote here to ensure that all members of the

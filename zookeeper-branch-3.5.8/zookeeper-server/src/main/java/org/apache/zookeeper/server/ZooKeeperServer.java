@@ -266,21 +266,21 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
      */
     public void loadData() throws IOException, InterruptedException {
         /*
-         * When a new leader starts executing Leader#lead, it 
+         * When a new leader starts executing Leader#lead, it
          * invokes this method. The database, however, has been
          * initialized before running leader election so that
          * the server could pick its zxid for its initial vote.
          * It does it by invoking QuorumPeer#getLastLoggedZxid.
          * Consequently, we don't need to initialize it once more
-         * and avoid the penalty of loading it a second time. Not 
+         * and avoid the penalty of loading it a second time. Not
          * reloading it is particularly important for applications
          * that host a large database.
-         * 
+         *
          * The following if block checks whether the database has
          * been initialized or not. Note that this method is
-         * invoked by at least one other method: 
+         * invoked by at least one other method:
          * ZooKeeperServer#startdata.
-         *  
+         *
          * See ZOOKEEPER-1642 for more detail.
          */
         if(zkDb.isInitialized()){
@@ -289,7 +289,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         else {
             setZxid(zkDb.loadDataBase());
         }
-        
+
         // Clean up dead sessions
         LinkedList<Long> deadSessions = new LinkedList<Long>();
         for (Long session : zkDb.getSessions()) {
@@ -358,7 +358,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     public SessionTracker getSessionTracker() {
         return sessionTracker;
     }
-    
+
     long getNextZxid() {
         return hzxid.incrementAndGet();
     }
@@ -456,7 +456,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
             createSessionTracker();
         }
         startSessionTracker();
-        // # 构建leader请求处理链
+        // ! 构建leader/follower请求处理链, 责任链模式,由具体的实现类实现
         setupRequestProcessors();
 
         registerJMX();
@@ -815,6 +815,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
             touch(si.cnxn);
             boolean validpacket = Request.isValid(si.type);
             if (validpacket) {
+                // ! 处理请求
                 firstProcessor.processRequest(si);
                 if (si.cnxn != null) {
                     incInProcess();
@@ -1146,6 +1147,11 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
                 // Always treat packet from the client as a possible
                 // local request.
                 setLocalSessionFlag(si);
+                // * 自定义方法,打印验证收到的客户端的消息
+                byte[] bytes = new byte[si.request.remaining()];
+                si.request.get(bytes);
+                System.out.println("收到客户端的消息: " + new String(bytes));
+                // ! 封装了的客户端最原始的数据
                 submitRequest(si);
             }
         }
@@ -1170,7 +1176,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
                     String authorizationID = saslServer.getAuthorizationID();
                     LOG.info("adding SASL authorization for authorizationID: " + authorizationID);
                     cnxn.addAuthInfo(new Id("sasl",authorizationID));
-                    if (System.getProperty("zookeeper.superUser") != null && 
+                    if (System.getProperty("zookeeper.superUser") != null &&
                         authorizationID.equals(System.getProperty("zookeeper.superUser"))) {
                         cnxn.addAuthInfo(new Id("super", ""));
                     }
@@ -1214,6 +1220,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         int opCode = request != null ? request.type : hdr.getType();
         long sessionId = request != null ? request.sessionId : hdr.getClientId();
         if (hdr != null) {
+            // ! getZKDatabase获取到内存数据库, processTxn步进
             rc = getZKDatabase().processTxn(hdr, txn);
         } else {
             rc = new ProcessTxnResult();

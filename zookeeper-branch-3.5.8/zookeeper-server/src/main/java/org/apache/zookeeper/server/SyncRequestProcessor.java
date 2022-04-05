@@ -106,8 +106,10 @@ public class SyncRequestProcessor extends ZooKeeperCriticalThread implements
             while (true) {
                 Request si = null;
                 if (toFlush.isEmpty()) {
+                    // # 取出数据
                     si = queuedRequests.take();
                 } else {
+                    // # 取出数据
                     si = queuedRequests.poll();
                     if (si == null) {
                         flush(toFlush);
@@ -155,8 +157,10 @@ public class SyncRequestProcessor extends ZooKeeperCriticalThread implements
                         }
                         continue;
                     }
+                    // # LinkedList存放request
                     toFlush.add(si);
                     if (toFlush.size() > 1000) {
+                        // ! 写本地数据
                         flush(toFlush);
                     }
                 }
@@ -174,11 +178,12 @@ public class SyncRequestProcessor extends ZooKeeperCriticalThread implements
     {
         if (toFlush.isEmpty())
             return;
-
+        // ! commit数据,快照和事务 这个commit是写本地文件,并不是收到半数之后的那个第二阶段commit
         zks.getZKDatabase().commit();
         while (!toFlush.isEmpty()) {
             Request i = toFlush.remove();
             if (nextProcessor != null) {
+                // ! 责任链调用 AckRequestProcessor
                 nextProcessor.processRequest(i);
             }
         }
@@ -211,6 +216,7 @@ public class SyncRequestProcessor extends ZooKeeperCriticalThread implements
 
     public void processRequest(Request request) {
         // request.addRQRec(">sync");
+        // ! 把request放到队列,进入SyncRequestProcessor#run方法查看
         queuedRequests.add(request);
     }
 

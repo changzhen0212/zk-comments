@@ -171,6 +171,7 @@ public class NettyServerCnxn extends ServerCnxn {
         if (closingChannel || !channel.isOpen()) {
             return;
         }
+        // ! 调用父类方法
         super.sendResponse(h, r, tag);
         if (h.getXid() > 0) {
             // zks cannot be null otherwise we would not have gotten here!
@@ -198,6 +199,7 @@ public class NettyServerCnxn extends ServerCnxn {
             close();
             return;
         }
+        // # netty发送
         channel.writeAndFlush(Unpooled.wrappedBuffer(sendBuffer)).addListener(onSendBufferDoneListener);
     }
 
@@ -476,6 +478,7 @@ public class NettyServerCnxn extends ServerCnxn {
                         if (initialized) {
                             // TODO: if zks.processPacket() is changed to take a ByteBuffer[],
                             // we could implement zero-copy queueing.
+                            // !
                             zks.processPacket(this, bb);
 
                             if (zks.shouldThrottle(outstandingCount.incrementAndGet())) {

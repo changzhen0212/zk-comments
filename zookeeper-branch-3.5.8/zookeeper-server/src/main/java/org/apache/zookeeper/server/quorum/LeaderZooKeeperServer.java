@@ -61,6 +61,7 @@ public class LeaderZooKeeperServer extends QuorumZooKeeperServer {
         return self.leader;
     }
 
+    // # 责任链模式 leader构建的 创建责任链
     @Override
     protected void setupRequestProcessors() {
         RequestProcessor finalProcessor = new FinalRequestProcessor(this);
@@ -69,10 +70,12 @@ public class LeaderZooKeeperServer extends QuorumZooKeeperServer {
                 Long.toString(getServerId()), false,
                 getZooKeeperServerListener());
         commitProcessor.start();
+        // ! 这条责任链里又构建了SyncRequestProcessor责任链
         ProposalRequestProcessor proposalProcessor = new ProposalRequestProcessor(this,
                 commitProcessor);
         proposalProcessor.initialize();
         prepRequestProcessor = new PrepRequestProcessor(this, proposalProcessor);
+        // ! 对 队列做处理, 看run方法
         prepRequestProcessor.start();
         firstProcessor = new LeaderRequestProcessor(this, prepRequestProcessor);
 

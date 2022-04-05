@@ -76,6 +76,7 @@ public class SyncedLearnerTracker {
             return this.qv;
         }
 
+        // # 收到的Ack都放到这个set,包括leader自己的和follower的
         public HashSet<Long> getAckset() {
             return this.ackset;
         }

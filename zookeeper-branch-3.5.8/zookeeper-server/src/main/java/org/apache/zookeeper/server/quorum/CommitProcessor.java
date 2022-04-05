@@ -157,12 +157,14 @@ public class CommitProcessor extends ZooKeeperCriticalThread implements
     public void run() {
         Request request;
         try {
+            // # while死循环,
             while (!stopped) {
                 synchronized(this) {
                     while (
                         !stopped &&
                         ((queuedRequests.isEmpty() || isWaitingForCommit() || isProcessingCommit()) &&
                          (committedRequests.isEmpty() || isProcessingRequest()))) {
+                        // # 如果队列为空,则wait()等待, 在processRequest唤醒,wakeup-->notifyAll()
                         wait();
                     }
                 }
@@ -187,6 +189,7 @@ public class CommitProcessor extends ZooKeeperCriticalThread implements
                  * came in for the pending request. We can only commit a
                  * request when there is no other request being processed.
                  */
+                // ! 处理已提交的请求：检查并查看提交是否针对待处理的请求。只有在没有其他请求正在处理时，我们才能提交一个请求
                 processCommitted();
             }
         } catch (Throwable e) {
@@ -213,6 +216,7 @@ public class CommitProcessor extends ZooKeeperCriticalThread implements
             if ( !isWaitingForCommit() && !queuedRequests.isEmpty()) {
                 return;
             }
+            // # 从 committedRequests 队列中获取消息
             request = committedRequests.poll();
 
             /*
@@ -235,6 +239,7 @@ public class CommitProcessor extends ZooKeeperCriticalThread implements
                 // nextProcessor returns.
                 currentlyCommitting.set(pending);
                 nextPending.set(null);
+                // ! ifelse中都会调用
                 sendToNextProcessor(pending);
             } else {
                 // this request came from someone else so just
@@ -270,6 +275,7 @@ public class CommitProcessor extends ZooKeeperCriticalThread implements
      */
     private void sendToNextProcessor(Request request) {
         numRequestsProcessing.incrementAndGet();
+        // ! 步进
         workerPool.schedule(new CommitWorkRequest(request), request.sessionId);
     }
 
@@ -295,6 +301,7 @@ public class CommitProcessor extends ZooKeeperCriticalThread implements
 
         public void doWork() throws RequestProcessorException {
             try {
+                // ! 责任链向下调用 --> ToBeAppliedRequestProcessor
                 nextProcessor.processRequest(request);
             } finally {
                 // If this request is the commit request that was blocking
@@ -319,6 +326,7 @@ public class CommitProcessor extends ZooKeeperCriticalThread implements
 
     @SuppressFBWarnings("NN_NAKED_NOTIFY")
     synchronized private void wakeup() {
+        // # 唤醒run方法中wait()的线程
         notifyAll();
     }
 
@@ -329,8 +337,12 @@ public class CommitProcessor extends ZooKeeperCriticalThread implements
         if (LOG.isDebugEnabled()) {
             LOG.debug("Committing request:: " + request);
         }
+        // # 把request数据丢到LinkedBlockingQueue<Request> committedRequests队列
         committedRequests.add(request);
+        // # 判断是否已经提交
         if (!isProcessingCommit()) {
+            // # 还没有完全提交进来if分支
+            // ! 唤醒, 进入CommitProcessor#processRequest查看
             wakeup();
         }
     }
@@ -343,6 +355,7 @@ public class CommitProcessor extends ZooKeeperCriticalThread implements
         if (LOG.isDebugEnabled()) {
             LOG.debug("Processing request:: " + request);
         }
+        // # 丢到队列里 对应着构建责任链时候的CommitProcessor#run方法里启用
         queuedRequests.add(request);
         if (!isWaitingForCommit()) {
             wakeup();

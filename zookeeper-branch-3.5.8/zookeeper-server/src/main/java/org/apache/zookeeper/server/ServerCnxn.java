@@ -71,6 +71,7 @@ public abstract class ServerCnxn implements Stats, Watcher {
     public void sendResponse(ReplyHeader h, Record r, String tag) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         // Make space for length
+        // # 序列化
         BinaryOutputArchive bos = BinaryOutputArchive.getArchive(baos);
         try {
             baos.write(fourBytes);
@@ -86,6 +87,7 @@ public abstract class ServerCnxn implements Stats, Watcher {
         serverStats().updateClientResponseSize(b.length - 4);
         ByteBuffer bb = ByteBuffer.wrap(b);
         bb.putInt(b.length - 4).rewind();
+        // ! 发送数据
         sendBuffer(bb);
     }
 

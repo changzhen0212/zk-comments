@@ -131,6 +131,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
     public void run() {
         try {
             while (true) {
+                // # 从队列里读取消息 对应着PrepRequestProcessor#processRequest方法中的 submittedRequests.add(request)
                 Request request = submittedRequests.take();
                 long traceMask = ZooTrace.CLIENT_REQUEST_TRACE_MASK;
                 if (request.type == OpCode.ping) {
@@ -142,6 +143,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
                 if (Request.requestOfDeath == request) {
                     break;
                 }
+                // ! 处理请求数据
                 pRequest(request);
             }
         } catch (RequestProcessorException e) {
@@ -350,7 +352,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
      * singleton, so there will be a single thread calling this code.
      *
      * @param type
-     * @param zxid
+     * @param zxid 事务id
      * @param request
      * @param record
      */
@@ -741,6 +743,7 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
             case OpCode.create:
             case OpCode.create2:
                 CreateRequest create2Request = new CreateRequest();
+                // !
                 pRequest2Txn(request.type, zks.getNextZxid(), request, create2Request, true);
                 break;
             case OpCode.createTTL:

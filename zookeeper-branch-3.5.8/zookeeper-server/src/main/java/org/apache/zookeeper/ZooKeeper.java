@@ -1524,6 +1524,7 @@ public class ZooKeeper implements AutoCloseable {
 
         RequestHeader h = new RequestHeader();
         h.setType(createMode.isContainer() ? ZooDefs.OpCode.createContainer : ZooDefs.OpCode.create);
+        // # data封装进request,同时还封装了createMode,serverpath
         CreateRequest request = new CreateRequest();
         CreateResponse response = new CreateResponse();
         request.setData(data);
@@ -1533,6 +1534,7 @@ public class ZooKeeper implements AutoCloseable {
             throw new KeeperException.InvalidACLException();
         }
         request.setAcl(acl);
+        // ! 发送request
         ReplyHeader r = cnxn.submitRequest(h, request, response, null);
         if (r.getErr() != 0) {
             throw KeeperException.create(KeeperException.Code.get(r.getErr()),

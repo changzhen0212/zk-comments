@@ -782,6 +782,7 @@ public class Leader {
        // in order to be committed, a proposal must be accepted by a quorum.
        //
        // getting a quorum from all necessary configurations.
+       //  ! 半数以上选举算法
         if (!p.hasAllQuorums()) {
            return false;                 
         }
@@ -827,9 +828,15 @@ public class Leader {
             informAndActivate(p, designatedLeader);
             //turnOffFollowers();
         } else {
+            // ! 二阶段逻辑, leader收到半数以上的ack
+            // ! 收到的ack过半, leader发送真正的commit给所有follower
+            // ! 发送给follower
             commit(zxid);
+
+            // ! 发送给observer
             inform(p);
         }
+        // ! leader提交, 把之前的日志文件数据写到内存中
         zk.commitProcessor.commit(p.request);
         if(pendingSyncs.containsKey(zxid)){
             for(LearnerSyncRequest r: pendingSyncs.remove(zxid)) {
@@ -891,13 +898,15 @@ public class Leader {
                     Long.toHexString(zxid), followerAddr);
             return;
         }
-        
-        p.addAck(sid);        
+
+        // ! 把ack放到一个HashSet
+        p.addAck(sid);
         /*if (LOG.isDebugEnabled()) {
             LOG.debug("Count for zxid: 0x{} is {}",
                     Long.toHexString(zxid), p.ackSet.size());
         }*/
-        
+
+        // ! 判断是否超过半数,超过就commit
         boolean hasCommitted = tryToCommit(p, zxid, followerAddr);
 
         // If p is a reconfiguration, multiple other operations may be ready to be committed,
@@ -952,12 +961,14 @@ public class Leader {
          * @see org.apache.zookeeper.server.RequestProcessor#processRequest(org.apache.zookeeper.server.Request)
          */
         public void processRequest(Request request) throws RequestProcessorException {
+            // ! 发送给下一个链条 --> FinalRequestProcessor
             next.processRequest(request);
 
             // The only requests that should be on toBeApplied are write
             // requests, for which we will have a hdr. We can't simply use
             // request.zxid here because that is set on read requests to equal
             // the zxid of the last write op.
+            // * 下面可能是一些收尾的逻辑
             if (request.getHdr() != null) {
                 long zxid = request.getHdr().getZxid();
                 Iterator<Proposal> iter = leader.toBeApplied.iterator();
@@ -992,7 +1003,9 @@ public class Leader {
      */
     void sendPacket(QuorumPacket qp) {
         synchronized (forwardingFollowers) {
+            // # 循环发给所有的follower
             for (LearnerHandler f : forwardingFollowers) {
+                // ! 丢到队列
                 f.queuePacket(qp);
             }
         }
@@ -1018,7 +1031,9 @@ public class Leader {
         synchronized(this){
             lastCommitted = zxid;
         }
+        // # 构建packet,类型为COMMIT, 发送给其他的follower
         QuorumPacket qp = new QuorumPacket(Leader.COMMIT, zxid, null, null);
+        // ! 发送给follower
         sendPacket(qp);
     }
 
@@ -1040,6 +1055,7 @@ public class Leader {
      * Create an inform packet and send it to all observers.
      */
     public void inform(Proposal proposal) {
+        // # 构建消息发送给observer
         QuorumPacket qp = new QuorumPacket(Leader.INFORM, proposal.request.zxid,
                                             proposal.packet.getData(), null);
         sendObserverPacket(qp);
@@ -1099,6 +1115,7 @@ public class Leader {
 
         byte[] data = SerializeUtils.serializeRequest(request);
         proposalStats.setLastBufferSize(data.length);
+        // # 构建packet,发送的都是类似QuorumPacket类型的数据包,只不过有Leader.PROPOSAL,ACK,PING等等...
         QuorumPacket pp = new QuorumPacket(Leader.PROPOSAL, request.zxid, data, null);
 
         Proposal p = new Proposal();
@@ -1122,6 +1139,7 @@ public class Leader {
 
             lastProposed = p.packet.getZxid();
             outstandingProposals.put(lastProposed, p);
+            // ! 发送数据包
             sendPacket(pp);
         }
         return p;

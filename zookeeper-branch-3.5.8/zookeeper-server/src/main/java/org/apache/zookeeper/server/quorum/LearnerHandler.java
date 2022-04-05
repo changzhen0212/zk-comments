@@ -241,6 +241,7 @@ public class LearnerHandler extends ZooKeeperThread {
         while (true) {
             try {
                 QuorumPacket p;
+                // # 从队列里那消息发给follower 对应着 LearnerHandler#queuePacket#queuedPackets.add()
                 p = queuedPackets.poll();
                 if (p == null) {
                     bufferedOutput.flush();
@@ -260,6 +261,7 @@ public class LearnerHandler extends ZooKeeperThread {
                 if (LOG.isTraceEnabled()) {
                     ZooTrace.logQuorumPacket(LOG, traceMask, 'o', p);
                 }
+                // ! 序列化,最终通过BIO写到follower上
                 oa.writeRecord(p, "packet");
             } catch (IOException e) {
                 if (!sock.isClosed()) {
@@ -494,6 +496,7 @@ public class LearnerHandler extends ZooKeeperThread {
             bufferedOutput.flush();
 
             // Start thread that blast packets in the queue to learner
+            // ! 启动线程，将队列中的数据包发送给leader
             startSendingPackets();
             
             /*
@@ -533,9 +536,10 @@ public class LearnerHandler extends ZooKeeperThread {
             //
             LOG.debug("Sending UPTODATE message to " + sid);      
             queuedPackets.add(new QuorumPacket(Leader.UPTODATE, -1, null, null));
-
+            // ! 死循环处理接收数据
             while (true) {
                 qp = new QuorumPacket();
+                // ! 反序列化
                 ia.readRecord(qp, "packet");
 
                 long traceMask = ZooTrace.SERVER_PACKET_TRACE_MASK;
@@ -553,6 +557,7 @@ public class LearnerHandler extends ZooKeeperThread {
                 int cxid;
                 int type;
 
+                // ! 判断消息类型
                 switch (qp.getType()) {
                 case Leader.ACK:
                     if (this.learnerType == LearnerType.OBSERVER) {
@@ -561,6 +566,7 @@ public class LearnerHandler extends ZooKeeperThread {
                         }
                     }
                     syncLimitCheck.updateAck(qp.getZxid());
+                    // ! 调用leader.processAck,跟leader自己处理ack相同
                     leader.processAck(this.sid, qp.getZxid(), sock.getLocalSocketAddress());
                     break;
                 case Leader.PING:
@@ -659,6 +665,7 @@ public class LearnerHandler extends ZooKeeperThread {
                     Thread.currentThread().setName(
                             "Sender-" + sock.getRemoteSocketAddress());
                     try {
+                        // ! 发送数据包
                         sendPackets();
                     } catch (InterruptedException e) {
                         LOG.warn("Unexpected interruption " + e.getMessage());
@@ -975,6 +982,8 @@ public class LearnerHandler extends ZooKeeperThread {
     }
     
     void queuePacket(QuorumPacket p) {
+        // # LinkedBlockingQueue<QuorumPacket> queuedPackets
+        // # 将消息放到队列中
         queuedPackets.add(p);
     }
 

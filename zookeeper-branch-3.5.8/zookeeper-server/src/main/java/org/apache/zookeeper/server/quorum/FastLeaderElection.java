@@ -773,7 +773,7 @@ public class FastLeaderElection implements Election {
                 voteSet.addAck(entry.getKey());
             }
         }
-
+        // ! 选举算法 半数以上
         return voteSet.hasAllQuorums();
     }
 

@@ -96,6 +96,7 @@ public class Follower extends Learner{
                 while (this.isRunning()) {
                     // ! 读取数据包 此处如果leader挂了会回到上面的finally，重新选举leader
                     readPacket(qp);
+                    // ! 处理包数据
                     processPacket(qp);
                 }
             } catch (Exception e) {
@@ -133,6 +134,7 @@ public class Follower extends Learner{
                         + " expected 0x"
                         + Long.toHexString(lastQueued + 1));
             }
+            // # 事务id
             lastQueued = hdr.getZxid();
             
             if (hdr.getType() == OpCode.reconfig){
@@ -140,7 +142,7 @@ public class Follower extends Learner{
                QuorumVerifier qv = self.configFromString(new String(setDataTxn.getData()));
                self.setLastSeenQuorumVerifier(qv, true);                               
             }
-            
+            // ! 写到本地文件
             fzk.logRequest(hdr, txn);
             break;
         case Leader.COMMIT:

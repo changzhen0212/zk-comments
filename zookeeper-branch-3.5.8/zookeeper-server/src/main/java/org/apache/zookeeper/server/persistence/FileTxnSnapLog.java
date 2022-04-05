@@ -490,6 +490,7 @@ public class FileTxnSnapLog {
      * @throws IOException
      */
     public void commit() throws IOException {
+        // # 事务
         txnLog.commit();
     }
 

@@ -125,6 +125,7 @@ public class WorkerService {
                 // make sure to map negative ids as well to [0, size-1]
                 int workerNum = ((int) (id % size) + size) % size;
                 ExecutorService worker = workers.get(workerNum);
+                // ! 把request都封装到线程池 ,scheduledWorkRequest是个Runnable,跟进run方法
                 worker.execute(scheduledWorkRequest);
             } catch (RejectedExecutionException e) {
                 LOG.warn("ExecutorService rejected execution", e);
@@ -152,6 +153,7 @@ public class WorkerService {
                     workRequest.cleanup();
                     return;
                 }
+                // ! doWork() 步进CommitWorkRequest实现类
                 workRequest.doWork();
             } catch (Exception e) {
                 LOG.warn("Unexpected exception", e);

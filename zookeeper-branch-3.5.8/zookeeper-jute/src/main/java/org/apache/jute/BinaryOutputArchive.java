@@ -118,8 +118,16 @@ public class BinaryOutputArchive implements OutputArchive {
     	out.writeInt(barr.length);
         out.write(barr);
     }
-    
+    // ! 最终写到从节点上去
     public void writeRecord(Record r, String tag) throws IOException {
+        // ! 传进来的是什么就看谁的序列化方法 比如 QuorumPacket
+        /** 实现中有
+         *
+         *  a_.startRecord(this,tag);
+         *  a_.writeInt(type,"type");
+         * ! a_.writeLong(zxid,"zxid");
+         *  a_.writeBuffer(data,"data");
+         * */
         r.serialize(this, tag);
     }
     

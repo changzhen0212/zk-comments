@@ -39,6 +39,7 @@ public class ProposalRequestProcessor implements RequestProcessor {
 
     SyncRequestProcessor syncProcessor;
 
+    // # 构建责任链
     public ProposalRequestProcessor(LeaderZooKeeperServer zks,
             RequestProcessor nextProcessor) {
         this.zks = zks;
@@ -71,14 +72,19 @@ public class ProposalRequestProcessor implements RequestProcessor {
         if (request instanceof LearnerSyncRequest){
             zks.getLeader().processSync((LearnerSyncRequest)request);
         } else {
+            // ! 责任链 --> CommitProcessor
             nextProcessor.processRequest(request);
             if (request.getHdr() != null) {
                 // We need to sync and get consensus on any transactions
                 try {
+                    // ! leader向follower发送request
+                    // ! 流程图里的1.1 发送Proposal
                     zks.getLeader().propose(request);
                 } catch (XidRolloverException e) {
                     throw new RequestProcessorException(e.getMessage(), e);
                 }
+                // ! 同步数据. 在初始化ProposalRequestProcessor时,初始化了SyncRequestProcessor责任链
+                // ! 流程图里的1.2 写本地数据文件
                 syncProcessor.processRequest(request);
             }
         }

@@ -431,6 +431,7 @@ public class ZKDatabase {
      * datatree/zkdatabase
      */
     public ProcessTxnResult processTxn(TxnHeader hdr, Record txn) {
+        // ! dataTree-树形结构,有watch监听机制, processTxn是提交数据
         return dataTree.processTxn(hdr, txn);
     }
 
@@ -584,6 +585,7 @@ public class ZKDatabase {
      * @throws IOException
      */
     public void commit() throws IOException {
+        // ! 快照
         this.snapLog.commit();
     }
 

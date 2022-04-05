@@ -75,6 +75,7 @@ public class QuorumMaj implements QuorumVerifier {
                 observingMembers.put(Long.valueOf(qs.id), qs);
             }
         }
+        // # votingMembers 只有leader和follower,不包括observer
         half = votingMembers.size() / 2;
     }
 
