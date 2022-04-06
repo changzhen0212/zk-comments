@@ -107,7 +107,8 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
                 }
             }
         }
-        if (sockKey.isWritable()) {
+        if (sockKey.isWritable()) { // ! 向服务端写消息
+            // ! 从outgoingQueue队列中取出命令包
             Packet p = findSendablePacket(outgoingQueue,
                     sendThread.tunnelAuthInProgress());
 
@@ -120,8 +121,10 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
                             (p.requestHeader.getType() != OpCode.auth)) {
                         p.requestHeader.setXid(cnxn.getXid());
                     }
+                    // ! 将待发送数据通过jute序列号后 封装到ByteBuffer中
                     p.createBB();
                 }
+                // ! 将数据发送给服务端
                 sock.write(p.bb);
                 if (!p.bb.hasRemaining()) {
                     sentCount.getAndIncrement();
@@ -284,6 +287,7 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
     void connect(InetSocketAddress addr) throws IOException {
         SocketChannel sock = createSock();
         try {
+           // # 注册连接
            registerAndConnect(sock, addr);
       } catch (IOException e) {
             LOG.error("Unable to open socket to " + addr);

@@ -881,6 +881,7 @@ public class ZooKeeper implements AutoCloseable {
         cnxn = createConnection(connectStringParser.getChrootPath(),
                 hostProvider, sessionTimeout, this, watchManager,
                 getClientCnxnSocket(), canBeReadOnly);
+        // ! 线程启动
         cnxn.start();
     }
 

@@ -1110,7 +1110,7 @@ public class ClientCnxn {
                 }
             }
             logStartConnect(addr);
-
+            // ! 建立连接，区分NIO和Netty实现
             clientCnxnSocket.connect(addr);
         }
 
@@ -1146,6 +1146,7 @@ public class ClientCnxn {
                         } else {
                             serverAddress = hostProvider.next(1000);
                         }
+                        // ! 与服务端建立NIO连接
                         startConnect(serverAddress);
                         clientCnxnSocket.updateLastSendAndHeard();
                     }
