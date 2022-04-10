@@ -156,6 +156,7 @@ public class NettyServerCnxn extends ServerCnxn {
         WatcherEvent e = event.getWrapper();
 
         try {
+            // ! 最终通过sendBuffer发送
             sendResponse(h, e, "notification");
         } catch (IOException e1) {
             if (LOG.isDebugEnabled()) {

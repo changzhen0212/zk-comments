@@ -98,7 +98,9 @@ class WatchManager {
         WatchedEvent e = new WatchedEvent(type,
                 KeeperState.SyncConnected, path);
         HashSet<Watcher> watchers;
+
         synchronized (this) {
+            // # 根据path取出watchers
             watchers = watchTable.remove(path);
             if (watchers == null || watchers.isEmpty()) {
                 if (LOG.isTraceEnabled()) {
@@ -111,14 +113,17 @@ class WatchManager {
             for (Watcher w : watchers) {
                 HashSet<String> paths = watch2Paths.get(w);
                 if (paths != null) {
+                    // ! 解释了监听机制一次性
                     paths.remove(path);
                 }
             }
         }
+        // ! 遍历全部的watcher 每个watcher回调
         for (Watcher w : watchers) {
             if (supress != null && supress.contains(w)) {
                 continue;
             }
+            // ! 每个watcher回调, 跟进 NettyServerCnxn
             w.process(e);
         }
         return watchers;

@@ -561,9 +561,12 @@ public class ZooKeeper implements AutoCloseable {
                 synchronized(watches) {
                     Set<Watcher> watchers = watches.get(clientPath);
                     if (watchers == null) {
+                        // # new一个HashSet
                         watchers = new HashSet<Watcher>();
+                        // # 路径和watcher绑定, 保证每个watcher都是自己路径监听的, 不同的get方法的路径不一样,触发的watcher也不一样
                         watches.put(clientPath, watchers);
                     }
+                    // # 把watcher全放进去
                     watchers.add(watcher);
                 }
             }
@@ -2117,7 +2120,9 @@ public class ZooKeeper implements AutoCloseable {
 
         // the watch contains the un-chroot path
         WatchRegistration wcb = null;
+        // # 此处判断了watcher!=null, 由上游调用的true, false决定
         if (watcher != null) {
+            // # 封装成 DataWatchRegistration 对应到SendThread#run中clientCnxnSocket.doTransport
             wcb = new DataWatchRegistration(watcher, clientPath);
         }
 
@@ -2160,6 +2165,7 @@ public class ZooKeeper implements AutoCloseable {
      */
     public byte[] getData(String path, boolean watch, Stat stat)
             throws KeeperException, InterruptedException {
+        // ! 根据参数 watch 是true还是false, 使用真正的watcher, false传入null
         return getData(path, watch ? watchManager.defaultWatcher : null, stat);
     }
 

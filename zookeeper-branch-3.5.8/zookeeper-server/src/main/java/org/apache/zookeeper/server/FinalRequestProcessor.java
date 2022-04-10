@@ -320,7 +320,7 @@ public class FinalRequestProcessor implements RequestProcessor {
                 rsp = new ExistsResponse(stat);
                 break;
             }
-            case OpCode.getData: {
+            case OpCode.getData: { // ! get命令
                 lastOp = "GETD";
                 GetDataRequest getDataRequest = new GetDataRequest();
                 ByteBufferInputStream.byteBuffer2Record(request.request,
@@ -333,8 +333,9 @@ public class FinalRequestProcessor implements RequestProcessor {
                         ZooDefs.Perms.READ,
                         request.authInfo);
                 Stat stat = new Stat();
+                // ! 从内存拿到数据,封装数组返回给客户端
                 byte b[] = zks.getZKDatabase().getData(getDataRequest.getPath(), stat,
-                        getDataRequest.getWatch() ? cnxn : null);
+                        getDataRequest.getWatch() ? cnxn : null); // # 三元运算符,watcher不为空时,传入了个cnxn的对象,此处是设计不好的点,最好用watcher对象
                 rsp = new GetDataResponse(b, stat);
                 break;
             }

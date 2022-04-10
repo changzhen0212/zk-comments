@@ -535,9 +535,10 @@ public class ClientCnxn {
               if (event instanceof WatcherSetEventPair) {
                   // each watcher will process the event
                   WatcherSetEventPair pair = (WatcherSetEventPair) event;
-                  // # 循环处理事件
+                  // # 循环处理watcher事件
                   for (Watcher watcher : pair.watchers) {
                       try {
+                          // # 调用监听回调方法
                           watcher.process(pair.event);
                       } catch (Throwable t) {
                           LOG.error("Error while calling watcher ", t);
@@ -690,7 +691,9 @@ public class ClientCnxn {
     // @VisibleForTesting
     protected void finishPacket(Packet p) {
         int err = p.replyHeader.getErr();
+        // # 判断watcher不为空,即是有watcher监听
         if (p.watchRegistration != null) {
+            // ! 注册watcher监听事件
             p.watchRegistration.register(err);
         }
         // Add all the removed watch events to the event queue, so that the

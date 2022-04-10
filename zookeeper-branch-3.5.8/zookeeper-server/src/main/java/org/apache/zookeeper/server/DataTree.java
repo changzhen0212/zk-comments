@@ -508,8 +508,9 @@ public class DataTree {
             updateCount(lastPrefix, 1);
             updateBytes(lastPrefix, data == null ? 0 : data.length);
         }
-        // ! 触发客户端回调
+        // ! 触发客户端回调 事件类型区分Event.EventType.NodeCreated
         dataWatches.triggerWatch(path, Event.EventType.NodeCreated);
+        // # 通过事件类型区分 Event.EventType.NodeChildrenChanged
         childWatches.triggerWatch(parentName.equals("") ? "/" : parentName,
                 Event.EventType.NodeChildrenChanged);
     }
@@ -660,6 +661,7 @@ public class DataTree {
         synchronized (n) {
             n.copyStat(stat);
             if (watcher != null) {
+                // # 构建dataWatches
                 dataWatches.addWatch(path, watcher);
             }
             return n.data;
